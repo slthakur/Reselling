@@ -37,12 +37,12 @@ App = {
     },
 
     initContract: function() {
-        $.getJSON('ChainList.json', function(chainListArtifact) {
+        $.getJSON('Reselling.json', function(ResellingArtifact) {
             // Get the necessary contract artifact file and use it to instantiate a truffle contract abstraction.
-            App.contracts.ChainList = TruffleContract(chainListArtifact);
+            App.contracts.Reselling = TruffleContract(ResellingArtifact);
 
             // Set the provider for our contract.
-            App.contracts.ChainList.setProvider(App.web3Provider);
+            App.contracts.Reselling.setProvider(App.web3Provider);
 
             // Listen for events
             App.listenToEvents();
@@ -62,11 +62,11 @@ App = {
         // refresh account information because the balance may have changed
         App.displayAccountInfo();
 
-        var chainListInstance;
+        var ResellingInstance;
 
-        App.contracts.ChainList.deployed().then(function(instance) {
-            chainListInstance = instance;
-            return chainListInstance.getArticlesForSale();
+        App.contracts.Reselling.deployed().then(function(instance) {
+            ResellingInstance = instance;
+            return ResellingInstance.getArticlesForSale();
         }).then(function(articleIds) {
             // Retrieve and clear the article placeholder
             var articlesRow = $('#articlesRow');
@@ -74,7 +74,7 @@ App = {
 
             for (var i = 0; i < articleIds.length; i++) {
                 var articleId = articleIds[i];
-                chainListInstance.articles(articleId).then(function(article) {
+                ResellingInstance.articles(articleId).then(function(article) {
                     App.displayArticle(
                         article[0],
                         article[1],
@@ -129,7 +129,7 @@ App = {
             return false;
         }
 
-        App.contracts.ChainList.deployed().then(function(instance) {
+        App.contracts.Reselling.deployed().then(function(instance) {
             return instance.sellArticle(_article_name, _description, _price, {
                 from: App.account,
                 gas: 500000
@@ -143,7 +143,7 @@ App = {
 
     // Listen for events raised from the contract
     listenToEvents: function() {
-        App.contracts.ChainList.deployed().then(function(instance) {
+        App.contracts.Reselling.deployed().then(function(instance) {
             instance.sellArticleEvent({}, {
                 fromBlock: 0,
                 toBlock: 'latest'
@@ -171,7 +171,7 @@ App = {
         var _articleId = $(event.target).data('id');
         var _price = parseFloat($(event.target).data('value'));
 
-        App.contracts.ChainList.deployed().then(function(instance) {
+        App.contracts.Reselling.deployed().then(function(instance) {
             return instance.buyArticle(_articleId, {
                 from: App.account,
                 value: web3.toWei(_price, "ether"),
